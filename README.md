@@ -12,11 +12,11 @@ Chat with your friends
   npm run build
 ```
 
-### Technologies used in sever
+### Technologies used in server
 
  - NodeJs;
  - MongoDb;
- - Websockts.
+ - Websockets.
 
 ## Client
 
@@ -28,7 +28,7 @@ Chat with your friends
 ### Tecnologies used in client
 
  - Python;
- - Websockts.
+ - Websockets.
 
 ### Chat commands
 

@@ -7,7 +7,7 @@ from sys import exit
 from custom_print import custom_print
 
 
-# a enum for errors, because the api returns the type of the error and not the error message
+# enum for errors, because the api returns the type of the error and not the error message
 class Errors(Enum):
   SHORT_NICK_ERROR = 'Min length allowed in nickname is 4'
   LONG_NICK_ERROR = 'Max length allowed in nickname is 20'
@@ -95,7 +95,7 @@ def add_user(api_url):
   return token
 
 
-# the main function
+# main function
 def user():
   action_type = None
   while action_type != 'y' and action_type != 'n':

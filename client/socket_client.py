@@ -79,7 +79,7 @@ def send_msg_client(data):
   print('{}> {}\n'.format(dic['nickname'], dic['msg']))
 
 
-# the main function
+# main function
 def socket_client(token):
   user['token'] = token
   server_url = 'http://localhost:3000'
