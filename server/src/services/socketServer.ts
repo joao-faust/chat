@@ -25,6 +25,7 @@ io.on('connection', (socket) => {
     const { token } = <Token>JSON.parse(data);
     const payload = authToken(token);
     if (!payload) {
+      socket.disconnect(true);
       return;
     }
 
@@ -62,8 +63,8 @@ io.on('connection', (socket) => {
     socket.on('exit-chat', () => {
       const msg = `${payload.nickname} exit from the chat\n`;
       socket.broadcast.emit('client-disconnected', JSON.stringify({ msg }));
-      socket.emit('disconnect-client');
       removeUser(nickname);
+      socket.disconnect(true);
     });
 
     // sends a message to everybody on the chat

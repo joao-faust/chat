@@ -29,12 +29,7 @@ def show_participants(data):
 # when a user connects to the server, a event is emitted to verify the token integrity
 @sio.on('connect')
 def connect():
-  sio.emit('verify-token', dumps({'token': user['token']}))
-
-
-@sio.on('disconnect-client')
-def disconnect_client():
-  sio.disconnect()
+  sio.emit('verify-token', dumps({'token': '123'}))
 
 
 @sio.on('client-disconnected')
