@@ -1,39 +1,24 @@
 import { Server } from 'socket.io';
 
-import authToken from './authToken';
-import server from '../config/server';
-
-type Msg = { msg: string };
-type Token = { token: string };
-type Command = { command: string };
+import JwtToken from './controllers/JwtToken';
+import server from './config/server';
+import Participant from './services/Participant';
+import { Command, Msg, Token } from './types';
 
 const io = new Server(server);
 const participants: string[] = [];
 
-const addUser = (nickname: string) => {
-  const index = participants.indexOf(nickname);
-  index === -1 ? participants.push(nickname) : '';
-};
-
-const removeUser = (nickname: string) => {
-  const index = participants.indexOf(nickname);
-  index !== -1 ? participants.splice(index, 1) : '';
-};
-
 io.on('connection', (socket) => {
   socket.on('verify-token', (data: string) => {
     const { token } = <Token>JSON.parse(data);
-    const payload = authToken(token);
+    const payload = JwtToken.validate(token);
     if (!payload) {
       socket.disconnect(true);
       return;
     }
 
     const { nickname } = payload;
-    addUser(nickname);
-
-    // informs the user that they can start sending messages
-    socket.emit('start-sending-msg');
+    Participant.add(participants, nickname);
 
     const msg = `${nickname} joined the chat\n`;
     socket.broadcast.emit('joined-chat', JSON.stringify({ msg }));
@@ -63,11 +48,10 @@ io.on('connection', (socket) => {
     socket.on('exit-chat', () => {
       const msg = `${payload.nickname} exit from the chat\n`;
       socket.broadcast.emit('client-disconnected', JSON.stringify({ msg }));
-      removeUser(nickname);
+      Participant.remove(participants, nickname);
       socket.disconnect(true);
     });
 
-    // sends a message to everybody on the chat
     socket.on('send-msg-server', (data: string) => {
       const { msg } = <Msg>JSON.parse(data);
 

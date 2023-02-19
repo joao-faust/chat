@@ -1,55 +1,46 @@
+import json
 from requests import post
 from getpass import getpass
-from json import loads
-from enum import Enum
-from sys import exit
 
-from custom_print import custom_print
+from util.Error import Error
+from util.custom_print import custom_print
 
 
-# enum for errors, because the api returns the type of the error and not the error message
-class Errors(Enum):
-  SHORT_NICK_ERROR = 'Min length allowed in nickname is 4'
-  LONG_NICK_ERROR = 'Max length allowed in nickname is 20'
-  SHORT_PASSWD_ERROR = 'Min length allowed in password is 8'
-  LONG_PASSWD_ERROR = 'Max length allowed in password is 72'
-  DIFFERENT_PASSWDS_ERROR = "Passwords don't match"
-  CREDENTIALS_ERROR = 'Invalid credentials'
-  EXISTS_NICK_ERROR = 'Nickname already exists'
-
-
-def nickname_input():
+# Asks for the nickname until a valid nickname is entered
+def ask_for_nickname():
   isValid, nickname = False, None
   while not isValid:
     nickname = input('Nickname> ')
     if len(nickname) < 4:
-      print(Errors.SHORT_NICK_ERROR.value)
+      print(Error.SHORT_NICK_ERROR.value)
     elif len(nickname) > 20:
-      print(Errors.LONG_NICK_ERROR.value)
+      print(Error.LONG_NICK_ERROR.value)
     else:
       isValid = True
   return nickname
 
 
-def password_input():
+# Asks for the passowrd until a valid password is entered
+def aks_for_password():
   isValid, password = False, None
   while not isValid:
     password = getpass('Password> ')
     if len(password) < 8:
-      print(Errors.SHORT_PASSWD_ERROR.value)
+      print(Error.SHORT_PASSWD_ERROR.value)
     elif len(password) > 72:
-      print(Errors.LONG_PASSWD_ERROR.value)
+      print(Error.LONG_PASSWD_ERROR.value)
     else:
       isValid = True
   return password
 
 
-def cfpassword_input(password):
+# Asks for the confirm password until it matches the password
+def ask_for_cfpassword(password):
   isValid, cfpassword = False, None
   while not isValid:
     cfpassword = getpass('Confirm Password> ')
     if cfpassword != password:
-      print(Errors.DIFFERENT_PASSWDS_ERROR.value)
+      print(Error.DIFFERENT_PASSWDS_ERROR.value)
     else:
       isValid = True
   return cfpassword
@@ -57,18 +48,15 @@ def cfpassword_input(password):
 
 def login(api_url):
   custom_print('login', 10, '\n', '\n')
-  try:
-    nickname = input('Nickname> ')
-    password = getpass('Passoword> ')
-  except KeyboardInterrupt:
-    exit(0)
+  nickname = input('Nickname> ')
+  password = getpass('Passoword> ')
 
   data = {'nickname': nickname, 'password': password}
 
   result = post(f'{api_url}/user/login', json=data)
-  dic = loads(result.content)
+  dic = json.loads(result.content)
   if result.status_code == 400:
-    print(Errors[dic['type']].value)
+    print(Error[dic['type']].value)
     return login(api_url)
 
   return result.headers['auth-token']
@@ -76,19 +64,16 @@ def login(api_url):
 
 def add_user(api_url):
   custom_print('register', 10, '\n', '\n')
-  try:
-    nickname = nickname_input()
-    password = password_input()
-    cfpassword = cfpassword_input(password)
-  except KeyboardInterrupt:
-    exit(0)
+  nickname = ask_for_nickname()
+  password = aks_for_password()
+  cfpassword = ask_for_cfpassword(password)
 
   data = {'nickname': nickname, 'password': password, 'cfpassword': cfpassword}
   result = post(f'{api_url}/user/add', json=data)
-  dic = loads(result.content)
+  dic = json.loads(result.content)
 
   if result.status_code == 400:
-    print(Errors[dic['type']].value)
+    print(Error[dic['type']].value)
     return add_user(api_url)
 
   token = login(api_url)
@@ -99,10 +84,7 @@ def add_user(api_url):
 def user():
   action_type = None
   while action_type != 'y' and action_type != 'n':
-    try:
-      action_type = input('Do you already have an account? Y or N> ').lower()
-    except KeyboardInterrupt:
-      exit(0)
+    action_type = input('Do you already have an account? Y or N> ').lower()
 
   api_url = 'http://localhost:3000'
   if action_type == 'y':

@@ -1,7 +1,7 @@
-from user import user
-from socket_client import socket_client
+from core.user import user
+from core.events import start_client
 
 
 if __name__ == '__main__':
   token = user()
-  socket_client(token)
+  start_client(token)

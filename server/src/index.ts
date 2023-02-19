@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import dbConnect from './config/dbConfig';
 import server from './config/server';
-import './services/socketServer';
+import './events';
 
 const PORT = <string>process.env.PORT;
 
