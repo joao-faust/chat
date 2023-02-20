@@ -1,7 +1,8 @@
 import socketio
 import json
+import sys
 
-from core.threads import Server, Message
+from core.threads import Server
 from util.custom_print import custom_print
 
 sio = socketio.Client()
@@ -49,6 +50,30 @@ def send_msg_client(data):
   print('{}> {}\n'.format(dic['nickname'], dic['msg']))
 
 
+# when a user connects to the server, it shows them a message indicating
+# that they can start sending messages
+def send_events_to_server():
+  print('\nType "!help" if you need it')
+  while True:
+    try:
+      msg = input('\n')
+    except:
+      break
+    try:
+      if msg == '!exit':
+        sio.emit('exit-chat')
+        break
+      elif msg == '!help':
+        sio.emit('help', json.dumps({'command': '!help'}))
+      elif msg == '!on':
+        sio.emit('participants', json.dumps({'command': '!on'}))
+      else:
+        data = json.dumps({'msg': msg})
+        sio.emit('send-msg-server', data)
+    except:
+      break
+
+
 # main function
 def start_client(token):
   global jwt_token
@@ -57,5 +82,4 @@ def start_client(token):
   server = Server(sio, 'http://localhost:3000')
   server.start()
 
-  message = Message(sio)
-  message.start()
+  send_events_to_server()
