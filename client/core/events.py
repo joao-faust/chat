@@ -5,13 +5,14 @@ from core.threads import Server
 from utils.custom_print import custom_print
 
 sio = socketio.Client()
-jwt_token = None
 
 
 # when a user connects to the server, a event is emitted to verify the token integrity
 @sio.on('connect')
 def connect():
-  sio.emit('verify-token', json.dumps({'token': jwt_token}))
+  with open('jwt_token.txt', 'r') as file:
+    jwt_token = file.readline()
+    sio.emit('verify-token', json.dumps({'token': jwt_token}))
 
 
 @sio.on('show-help')
@@ -74,10 +75,7 @@ def send_events_to_server():
 
 
 # main function
-def start_client(token):
-  global jwt_token
-  jwt_token = token
-
+def start_client():
   server = Server(sio, 'http://localhost:3000')
   server.start()
 

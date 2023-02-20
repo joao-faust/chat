@@ -7,10 +7,13 @@ from getpass import getpass
 from utils.Error import Error
 from utils.custom_print import custom_print
 
+api_url = 'http://localhost:3000'
+
 
 # Asks for the nickname until a valid nickname is entered
 def ask_for_nickname():
-  isValid, nickname = False, None
+  isValid = False
+  nickname = ''
   while not isValid:
     nickname = input('Nickname> ')
     if len(nickname) < 4:
@@ -24,7 +27,8 @@ def ask_for_nickname():
 
 # Asks for the passowrd until a valid password is entered
 def aks_for_password():
-  isValid, password = False, None
+  isValid = False
+  password = ''
   while not isValid:
     password = getpass('Password> ')
     if len(password) < 8:
@@ -38,7 +42,8 @@ def aks_for_password():
 
 # Asks for the confirm password until it matches the password
 def ask_for_cfpassword(password):
-  isValid, cfpassword = False, None
+  isValid = False
+  cfpassword = ''
   while not isValid:
     cfpassword = getpass('Confirm Password> ')
     if cfpassword != password:
@@ -48,7 +53,7 @@ def ask_for_cfpassword(password):
   return cfpassword
 
 
-def login(api_url):
+def login():
   custom_print('login', 10, '\n', '\n')
   try:
     nickname = input('Nickname> ')
@@ -57,17 +62,19 @@ def login(api_url):
     sys.exit(0)
 
   data = {'nickname': nickname, 'password': password}
-
   result = post(f'{api_url}/user/login', json=data)
   dic = json.loads(result.content)
+
   if result.status_code == 400:
     print(Error[dic['type']].value)
-    return login(api_url)
+    return login()
 
-  return result.headers['auth-token']
+  with open('jwt_token.txt', 'w') as file:
+    jwt_token = result.headers['auth-token']
+    file.write(jwt_token)
 
 
-def add_user(api_url):
+def add_user():
   custom_print('register', 10, '\n', '\n')
   try:
     nickname = ask_for_nickname()
@@ -82,25 +89,20 @@ def add_user(api_url):
 
   if result.status_code == 400:
     print(Error[dic['type']].value)
-    return add_user(api_url)
-
-  token = login(api_url)
-  return token
+    return add_user()
+  login()
 
 
 # main function
 def user():
-  action_type = None
+  action_type = ''
   while action_type != 'y' and action_type != 'n':
     try:
       action_type = input('Do you already have an account? Y or N> ').lower()
     except:
       sys.exit(0)
 
-  api_url = 'http://localhost:3000'
   if action_type == 'y':
-    token = login(api_url)
-    return token
-
-  token = add_user(api_url)
-  return token
+    login()
+    return
+  add_user()
