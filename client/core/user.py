@@ -1,4 +1,6 @@
 import json
+import sys
+
 from requests import post
 from getpass import getpass
 
@@ -48,8 +50,11 @@ def ask_for_cfpassword(password):
 
 def login(api_url):
   custom_print('login', 10, '\n', '\n')
-  nickname = input('Nickname> ')
-  password = getpass('Passoword> ')
+  try:
+    nickname = input('Nickname> ')
+    password = getpass('Passoword> ')
+  except:
+    sys.exit(0)
 
   data = {'nickname': nickname, 'password': password}
 
@@ -64,9 +69,12 @@ def login(api_url):
 
 def add_user(api_url):
   custom_print('register', 10, '\n', '\n')
-  nickname = ask_for_nickname()
-  password = aks_for_password()
-  cfpassword = ask_for_cfpassword(password)
+  try:
+    nickname = ask_for_nickname()
+    password = aks_for_password()
+    cfpassword = ask_for_cfpassword(password)
+  except:
+    sys.exit(0)
 
   data = {'nickname': nickname, 'password': password, 'cfpassword': cfpassword}
   result = post(f'{api_url}/user/add', json=data)
@@ -84,7 +92,10 @@ def add_user(api_url):
 def user():
   action_type = None
   while action_type != 'y' and action_type != 'n':
-    action_type = input('Do you already have an account? Y or N> ').lower()
+    try:
+      action_type = input('Do you already have an account? Y or N> ').lower()
+    except:
+      sys.exit(0)
 
   api_url = 'http://localhost:3000'
   if action_type == 'y':

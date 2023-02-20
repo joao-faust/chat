@@ -17,6 +17,12 @@ io.on('connection', (socket) => {
       return;
     }
 
+    socket.on('disconnect', () => {
+      const msg = `${payload.nickname} exit from the chat\n`;
+      socket.broadcast.emit('client-disconnected', JSON.stringify({ msg }));
+      Participant.remove(participants, nickname);
+    });
+
     const { nickname } = payload;
     Participant.add(participants, nickname);
 
@@ -46,9 +52,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('exit-chat', () => {
-      const msg = `${payload.nickname} exit from the chat\n`;
-      socket.broadcast.emit('client-disconnected', JSON.stringify({ msg }));
-      Participant.remove(participants, nickname);
       socket.disconnect(true);
     });
 
