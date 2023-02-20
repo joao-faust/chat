@@ -1,6 +1,5 @@
 import socketio
 import json
-import sys
 
 from core.threads import Server
 from utils.custom_print import custom_print
