@@ -1,4 +1,4 @@
-from threading import Thread, Event
+from threading import Thread
 
 
 class Server(Thread):

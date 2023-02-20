@@ -3,7 +3,7 @@ import json
 import sys
 
 from core.threads import Server
-from util.custom_print import custom_print
+from utils.custom_print import custom_print
 
 sio = socketio.Client()
 jwt_token = None

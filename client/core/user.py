@@ -4,8 +4,8 @@ import sys
 from requests import post
 from getpass import getpass
 
-from util.Error import Error
-from util.custom_print import custom_print
+from utils.Error import Error
+from utils.custom_print import custom_print
 
 
 # Asks for the nickname until a valid nickname is entered
